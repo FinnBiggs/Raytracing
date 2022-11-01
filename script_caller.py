@@ -31,7 +31,7 @@ def one_2d(lens_filename, z_init, y_init, slope_init, z_screen = None):
 # 	offset		+/- y offset around center (separation is twice this)
 # 	[z_screen]	optional screen location for analysis of ray positions
 def par_2d(lens_filename, z_init, y_init, slope_init, offset, z_screen = None):
-    cmd_str = "python par_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init)
+    cmd_str = "python par_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init, offset)
     if z_screen is not None:
         cmd_str += " {}".format(z_screen)
     cmd_str += " >> {}".format(file_name)
