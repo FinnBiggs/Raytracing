@@ -3,6 +3,9 @@ import numpy as np
 
 file_name = "data.txt"
 
+def get_file_name():
+    return file_name
+
 def set_file_name(f):
     file_name = f
 
@@ -17,7 +20,7 @@ def clear_file():
 # 	slope_init	initial tangent (delta_y/delta_z) of ray
 # 	[z_screen]	optional screen location for analysis of intercept
 def one_2d(lens_filename, z_init, y_init, slope_init, z_screen = None):
-    cmd_str = "python one_2d.py {} {} {} {}".format(lens_filename, z_init, y_init, slope_init)
+    cmd_str = "python raytracing/one_2d.py {} {} {} {}".format(lens_filename, z_init, y_init, slope_init)
     if z_screen is not None:
         cmd_str += " {}".format(z_screen)
     cmd_str += " >> {}".format(file_name)
@@ -31,7 +34,7 @@ def one_2d(lens_filename, z_init, y_init, slope_init, z_screen = None):
 # 	offset		+/- y offset around center (separation is twice this)
 # 	[z_screen]	optional screen location for analysis of ray positions
 def par_2d(lens_filename, z_init, y_init, slope_init, offset, z_screen = None):
-    cmd_str = "python par_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init, offset)
+    cmd_str = "python raytracing/par_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init, offset)
     if z_screen is not None:
         cmd_str += " {}".format(z_screen)
     cmd_str += " >> {}".format(file_name)
@@ -45,7 +48,7 @@ def par_2d(lens_filename, z_init, y_init, slope_init, offset, z_screen = None):
 # 	offset_angle	+/- slope offset around centerline (sep. is twice this)
 # 	[z_screen]	optional screen location for analysis of ray positions
 def point_2d(lens_filename, z_init, y_init, slope_init, offset_angle, z_screen=None):
-    cmd_str = "python point_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init, offset_angle)
+    cmd_str = "python raytracing/point_2d.py {} {} {} {} {}".format(lens_filename, z_init, y_init, slope_init, offset_angle)
     if z_screen is not None:
         cmd_str += " {}".format(z_screen)
     cmd_str += " >> {}".format(file_name)
