@@ -144,7 +144,7 @@ for i in range(n_surf):		# now propagate surface-at-a-time
   y.append(out_ray[1])
   thet.append(out_ray[2])
 
-  print ("Ray %d has z = %f; y = %f; thet = %f" % \
+print("Ray %d has z = %f; y = %f; thet = %f" % \
               (i+2,z[i+1],y[i+1],thet[i+1]))
 
 # final +y ray parameters
