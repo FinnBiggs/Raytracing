@@ -1,12 +1,14 @@
 import os
 import numpy as np
 
+global file_name 
 file_name = "data.txt"
 
-def get_file_name():
+def get_file():
     return file_name
 
-def set_file_name(f):
+def set_file(f):
+    global file_name
     file_name = f
 
 def clear_file():
