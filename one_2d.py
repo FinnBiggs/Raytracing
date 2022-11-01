@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
 """
-point_2d.py	written by Tom Murphy (UCSD) for educational purposes
-		traces a pair of rays emanating from (or converging toward)
-		a point through a lens system
+one_2d.py	written by Tom Murphy (UCSD) for educational purposes
+		traces a single ray through a lens system
 usage:
 	lens_filename	see README_lens.txt for prescription
-	z_init		z location of ray intersection (point)
-	y_init		y location of ray intersection (point)
-	slope_init	initial tangent (delt_y/delt_z) of average (centerline)
-	offset_angle	+/- slope offset around centerline (sep. is twice this)
-	[z_screen]	optional screen location for analysis of ray positions
+	z_init		initial z location of ray to trace
+	y_init		initial y location of ray to trace
+	slope_init	initial tangent (delta_y/delta_z) of ray
+	[z_screen]	optional screen location for analysis of intercept
+example:
+one_2d.py bicx -10.0 0.1 0.0 150.0
+	selects a bi-convex lens file, starts a ray at z=-10 and just a bit
+	off the optical axis (0.1 units), parallel to the axis (slope 0; so
+	this would be a paraxial ray).  The screen is placed at the expected
+	focus position for this particular lens (at z = 150 units)
 """
 
 from math import *
@@ -59,7 +63,7 @@ def  ray_step(in_ray, surface):
   #print "%f %f %f %f" % (z_v,z_new,y_new,thet_norm)
 
   if (z_new < z0):
-    print("WARNING: ray jumped backwards!")
+    print "WARNING: ray jumped backwards!"
 
   out_ray[0] = z_new
   out_ray[1] = y_new
@@ -82,28 +86,19 @@ surf_params = [0.0]*5
 
 screen_pos=0.0
 
-if (narg > 5):			# must have at least these five
+if (narg > 4):			# must have at least these four
   filename = sys.argv[1]
-  startz = float(sys.argv[2])
-  starty = float(sys.argv[3])
+  z.append(float(sys.argv[2]))
+  y.append(float(sys.argv[3]))
   slope = float(sys.argv[4])
-  angle = float(sys.argv[5])
 else:
-  print("Must supply lens_file_name z0, y0, slope, angle arguments")
+  print "Must supply lens_file_name z0, y0, slope arguments"
   sys.exit()
 
-if (narg > 6):		# optionally, put a screen somewhere
-  screen_pos = float(sys.argv[6])
+if (narg > 5):		# optionally, put a screen somewhere
+  screen_pos = float(sys.argv[5])
 
-# define +y ray to have greater slope by "angle"
-z.append(startz)
-y.append(starty)
-thet.append(atan(slope) + angle)	# input slope --> angle in radians
-
-# define -y ray to have lesser slope by "angle"
-z.append(startz)
-y.append(starty)
-thet.append(atan(slope)-angle)
+thet.append(atan(slope))	# input slope --> angle in radians
 
 lens_file = open(filename,'r');	# grab lens surface parameters
 n_surf = int(lens_file.readline().strip())	# number of surfaces (1st line)
@@ -118,12 +113,12 @@ for i in range(n_surf): 		# and n_surf additional lines...
   R.append(float(Slist[2]))
   K.append(float(Slist[3]))
   current_z += z_vert[i+1]
-  print ("Surface %d has n = %f, z_vert = %f, radius = %g, K = %f" % \
-         (i+1,n[i+1],current_z,R[i+1],K[i+1]) )
+  print "Surface %d has n = %f, z_vert = %f, radius = %g, K = %f" % \
+         (i+1,n[i+1],current_z,R[i+1],K[i+1])
+
 lens_file.close()
 
-print( "Ray 1+ has z = %f; y = %f; thet = %f" % (z[0],y[0],thet[0]))
-print( "Ray 1- has z = %f; y = %f; thet = %f" % (z[1],y[1],thet[1]))
+print "Ray 1 has z = %f; y = %f; thet = %f" % (z[0],y[0],thet[0])
 
 current_z = 0.0
 for i in range(n_surf):		# now propagate surface-at-a-time
@@ -137,11 +132,11 @@ for i in range(n_surf):		# now propagate surface-at-a-time
   surf_params[4] = n[i+1]
 
   # populate in_ray array for +y ray
-  in_ray[0] = z[2*i]
-  in_ray[1] = y[2*i]
-  in_ray[2] = thet[2*i]
+  in_ray[0] = z[i]
+  in_ray[1] = y[i]
+  in_ray[2] = thet[i]
 
-  # carry out +y calculation
+  # carry out calculation
   out_ray = ray_step(in_ray,surf_params)
 
   # stow out_ray into approp. arrays
@@ -149,50 +144,19 @@ for i in range(n_surf):		# now propagate surface-at-a-time
   y.append(out_ray[1])
   thet.append(out_ray[2])
 
-  # populate in_ray array for -y ray
-  in_ray[0] = z[2*i+1]
-  in_ray[1] = y[2*i+1]
-  in_ray[2] = thet[2*i+1]
-
-  # carry out -y calculation
-  out_ray = ray_step(in_ray,surf_params)
-
-  # stow out_ray into approp. arrays
-  z.append(out_ray[0])
-  y.append(out_ray[1])
-  thet.append(out_ray[2])
-
-  print ("Ray %d+ has z = %f; y = %f; thet = %f" % \
-              (i+2,z[2*i+2],y[2*i+2],thet[2*i+2]))
-  print ("Ray %d- has z = %f; y = %f; thet = %f" % \
-              (i+2,z[2*i+3],y[2*i+3],thet[2*i+3]))
+  print "Ray %d has z = %f; y = %f; thet = %f" % \
+              (i+2,z[i+1],y[i+1],thet[i+1])
 
 # final +y ray parameters
-zf0 = z[2*n_surf]
-yf0 = y[2*n_surf]
-thetf0 = thet[2*n_surf]
-mf0 = tan(thetf0)
-
-# final secondary ray parameters
-zf1 = z[2*n_surf+1]
-yf1 = y[2*n_surf+1]
-thetf1 = thet[2*n_surf+1]
-mf1 = tan(thetf1)
+zf = z[n_surf]
+yf = y[n_surf]
+thetf = thet[n_surf]
+mf = tan(thetf)
 
 # compute intercepts
-screen_intercept0 = yf0 + mf0*(screen_pos - zf0)
-z_intercept0 = zf0 - yf0/mf0
-screen_intercept1 = yf1 + mf1*(screen_pos - zf1)
-z_intercept1 = zf1 - yf1/mf1
+screen_intercept = yf + mf*(screen_pos - zf)
+z_intercept = zf - yf/mf
 
-print ("+y ray intercepts screen at (%.3f, %f); z-axis at (%f, 0.0)" % \
-        (screen_pos,screen_intercept0, z_intercept0))
-print ("-y ray intercepts screen at (%.3f, %f); z-axis at (%f, 0.0)" % \
-        (screen_pos,screen_intercept1, z_intercept1))
-
-# calculate ray intersection position
-zint = (yf1 - yf0 + mf0*zf0 - mf1*zf1)/(mf0-mf1)
-yint = yf0 + mf0*(zint - zf0)
-
-print ("Rays intersect at (z,y) = (%f, %f)" % (zint,yint))
+print "+Ray intercepts screen at (%.3f, %f); z-axis at (%f, 0.0)" % \
+        (screen_pos,screen_intercept, z_intercept)
 
